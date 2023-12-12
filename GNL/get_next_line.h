@@ -15,5 +15,6 @@ int		ft_strlen(char *str);
 char	*ft_strdup(char *str);
 void	extract_line(char *buf, char **line);
 void	add_to_stash(char stash[BUFFER_SIZE + 1], char *buf);
+void	free_line_memory(char *line);
 
 #endif

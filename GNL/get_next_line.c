@@ -4,15 +4,14 @@
 
 char *get_next_line(int fd)
 {
-	static char stash[BUFFER_SIZE + 1];
-	char	*line;
+	static char	stash[BUFFER_SIZE + 1];
+	char		*line;
 
-	line = NULL;
-	line = ft_strjoin(line, stash);
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
+	line = NULL;
+	line = ft_strjoin(line, stash);
 	read_and_add(fd, &line, stash);
-
 	return (line);
 }
 
@@ -28,11 +27,12 @@ void	read_and_add(int fd, char **line, char stash[BUFFER_SIZE + 1])
 		if (!buf)
 			return ;
 		readed = read(fd, buf, BUFFER_SIZE);
-		if (readed < 0)
+		if (readed <= 0)
 		{
 			free (buf);
 			return ;
 		}
+		buf[readed] = '\0';
 		if (found_newline(buf, readed))
 		{
 			extract_line(buf, line);
@@ -40,10 +40,7 @@ void	read_and_add(int fd, char **line, char stash[BUFFER_SIZE + 1])
 			free (buf);
 			return ;
 		}
-		else 
-		{
-			(*line) = ft_strjoin(*line, buf);
-		}
+		(*line) = ft_strjoin(*line, buf);
 		free (buf);
 	}
 }
@@ -66,6 +63,7 @@ char	*ft_strjoin(char *s1, char *s2)
 {
 	char *ptr;
 	char *current_ptr;
+	char *previous;
 
 	if (!s1 && !s2)
 		return (NULL);
@@ -77,18 +75,31 @@ char	*ft_strjoin(char *s1, char *s2)
 	if (!ptr)
 		return (NULL);
 	current_ptr = ptr;
+	previous = s1;
 	while (*s1)
 		*ptr++ = *s1++;
 	while (*s2)
 		*ptr++ = *s2++;
 	*ptr = '\0';
+	free_line_memory(previous);
 	return (current_ptr);
+}
+
+void free_line_memory(char *line)
+{
+    if (line)
+	{
+        free(line);
+        line = NULL;
+    }
 }
 
 int	ft_strlen(char *str)
 {
 	int i;
 
+	if (!str)
+		return (0);
 	i = 0;
 	while (str[i])
 		i++;
@@ -112,8 +123,8 @@ char *ft_strdup(char *str)
 
 void	extract_line(char *buf, char **line)
 {
-	int	i;
-	char str[BUFFER_SIZE + 1];
+	int		i;
+	char	str[BUFFER_SIZE + 1];
 
 	i = 0;
 	while (buf[i] && buf[i] != '\n')
@@ -125,7 +136,7 @@ void	extract_line(char *buf, char **line)
 	{
 		str[i] = buf[i];
 		i++;
- 	}
+	}
 	str[i] = '\0';
 	(*line) = ft_strjoin(*line, str);
 }

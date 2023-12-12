@@ -12,7 +12,7 @@ int	main(void)
 	while (i < 3)
 	{
 		line = get_next_line(fd);
-		printf("%s\n", line);
+		printf("%s", line);
 		if (line == NULL)
 		{
 			free (line);
