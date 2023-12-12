@@ -4,26 +4,24 @@
 
 char *get_next_line(int fd)
 {
-	printf ("test (1) \n");
-	char	stash[BUFFER_SIZE + 1];
+	static char stash[BUFFER_SIZE + 1];
 	char	*line;
 
 	line = NULL;
+	line = ft_strjoin(line, stash);
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
-	printf ("test (2) \n");
-	read_and_add(fd, &line);
+	read_and_add(fd, &line, stash);
 
 	return (line);
 }
 
-void	read_and_add(int fd, char **line)
+void	read_and_add(int fd, char **line, char stash[BUFFER_SIZE + 1])
 {
 	int		readed;
 	char	*buf;
 
 	readed = 1;
-	printf ("test (3) \n");
 	while (readed > 0)
 	{
 		buf = malloc(sizeof(char) * (BUFFER_SIZE + 1));
@@ -35,15 +33,15 @@ void	read_and_add(int fd, char **line)
 			free (buf);
 			return ;
 		}
-		printf ("test (4) \n");
 		if (found_newline(buf, readed))
 		{
-			extract_line(buf, line, stash);
-			clear_stash(strash);
+			extract_line(buf, line);
+			add_to_stash(stash, buf);
+			free (buf);
+			return ;
 		}
 		else 
 		{
-			printf ("test (5) \n");
 			(*line) = ft_strjoin(*line, buf);
 		}
 		free (buf);
@@ -69,16 +67,13 @@ char	*ft_strjoin(char *s1, char *s2)
 	char *ptr;
 	char *current_ptr;
 
-	printf ("test (6) \n");
 	if (!s1 && !s2)
 		return (NULL);
 	else if (!s1)
 		return (ft_strdup(s2));
 	else if (!s2)
 		return (ft_strdup(s1));
-	printf ("test (7) \n");
 	ptr = malloc(sizeof(char) * (ft_strlen(s1) + ft_strlen(s2) + 1));
-	printf ("test (8) \n");
 	if (!ptr)
 		return (NULL);
 	current_ptr = ptr;
@@ -86,7 +81,7 @@ char	*ft_strjoin(char *s1, char *s2)
 		*ptr++ = *s1++;
 	while (*s2)
 		*ptr++ = *s2++;
-		*ptr = '\0';
+	*ptr = '\0';
 	return (current_ptr);
 }
 
@@ -115,7 +110,38 @@ char *ft_strdup(char *str)
 	return (current_ptr);
 }
 
-void	extract_line(buf, line, stash)
+void	extract_line(char *buf, char **line)
 {
+	int	i;
+	char str[BUFFER_SIZE + 1];
 
+	i = 0;
+	while (buf[i] && buf[i] != '\n')
+	{
+		str[i] = buf[i];
+		i++;
+	}
+	if (buf[i] == '\n')
+	{
+		str[i] = buf[i];
+		i++;
+ 	}
+	str[i] = '\0';
+	(*line) = ft_strjoin(*line, str);
+}
+
+void	add_to_stash(char stash[BUFFER_SIZE + 1], char *buf)
+{
+	int	i;
+	int	j;
+
+	i = 0;
+	j = 0;
+	while (buf[i] && buf[i] != '\n')
+		i++;
+	if (buf[i] == '\n')
+		i++;
+	while (buf[i])
+		stash[j++] = buf[i++];
+	stash[j] = '\0';
 }
