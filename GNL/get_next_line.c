@@ -7,10 +7,10 @@ char *get_next_line(int fd)
 	static char	stash[BUFFER_SIZE + 1];
 	char		*line;
 
-	if (fd < 0 || BUFFER_SIZE <= 0)
+	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, 0, 0) == -1)
 		return (NULL);
 	line = NULL;
-	line = ft_strjoin(line, stash);
+	//line = ft_strjoin(line, stash);
 	read_and_add(fd, &line, stash);
 	return (line);
 }
@@ -33,6 +33,8 @@ void	read_and_add(int fd, char **line, char stash[BUFFER_SIZE + 1])
 			return ;
 		}
 		buf[readed] = '\0';
+		if (*line == NULL)
+			(*line) = ft_strjoin(*line, stash);
 		if (found_newline(buf, readed))
 		{
 			extract_line(buf, line);
@@ -52,7 +54,7 @@ int	found_newline(char *buf, int readed)
 	i = 0;
 	while (i < readed)
 	{
-		if ( buf[i] == '\n')
+		if (buf[i] == '\n')
 			return (1);
 		i++;
 	}
